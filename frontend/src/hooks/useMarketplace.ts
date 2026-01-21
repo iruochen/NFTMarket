@@ -13,7 +13,6 @@ import {
 	NFT_ADDRESS,
 	NFT_ABI,
 } from "../constants"
-import { useAccount } from "wagmi"
 
 export interface Listing {
 	listingId: bigint
@@ -37,6 +36,7 @@ export function useMarketplace() {
 	})
 
 	// 2. Prepare calls for all listings
+	// TODO 根据listingCounter查询是否合理，数据量大时可能会有gas和性能问题
 	const counter = listingCounter ? Number(listingCounter) : 0
 	// Create array of indices [0, 1, ... counter-1]
 	const listingIndices = Array.from({ length: counter }, (_, i) => BigInt(i))

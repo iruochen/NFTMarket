@@ -1,6 +1,6 @@
 "use client"
 
-import { useAccount } from "wagmi"
+import { useAccount, useConnection } from "wagmi"
 import { useAppKit } from "@reown/appkit/react"
 import { useState, useEffect, useCallback } from "react"
 import Navbar from "@/components/Navbar"
@@ -14,7 +14,7 @@ import { LayoutGrid, User, RefreshCw, Loader2 } from "lucide-react"
 
 export default function Home() {
 	const { open } = useAppKit()
-	const { address } = useAccount()
+	const { address } = useConnection()
 	const [activeTab, setActiveTab] = useState<"market" | "profile">("market")
 
 	// Market Data
@@ -77,6 +77,7 @@ export default function Home() {
 	// Derived state: Market items mapped to NFTItem structure
 	const marketItems: NFTItem[] = listings.map((l) => ({
 		tokenId: l.tokenId,
+		// TODO tokenURI 没有保存，页面如何展示？
 		tokenURI: "", // Optimization: We rely on card placeholder/visuals for market items
 		owner: l.seller,
 		seller: l.seller,
@@ -194,6 +195,7 @@ export default function Home() {
 				{/* Content Area */}
 				<div className="min-h-100">
 					{activeTab === "market" ? (
+						// Market Tab
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 							{marketItems.length > 0
 								? marketItems.map((item) => (
@@ -225,6 +227,7 @@ export default function Home() {
 									)}
 						</div>
 					) : (
+						// Profile Tab
 						<div>
 							{!address ? (
 								<div className="flex flex-col items-center justify-center py-20 text-center">
