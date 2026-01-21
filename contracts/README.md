@@ -1,173 +1,309 @@
-# NFTMarket Project / NFTMarket 项目
+# Smart Contracts | 智能合约
 
-[English](#english) | [中文](#chinese)
-
-<a name="english"></a>
+[English](#english) | [中文](#中文)
 
 ## English
 
-### Overview
+This directory contains the Solidity smart contracts for the NFT Marketplace, built using the Foundry framework.
 
-A decentralized NFT Marketplace built on Ethereum, featuring a complete ecosystem with a custom ERC20 payment token and an ERC721 NFT collection. Users can mint NFTs, list them for sale, and purchase them using the native RCH token.
+### 📋 Contracts Overview
 
-### Features
+#### Core Contracts
 
-- **NFT Marketplace (`NFTMarket.sol`)**
-  - **List**: Sellers can list their NFTs for sale at a specific price.
-  - **Buy**: Buyers can purchase listed NFTs using RCH tokens.
-  - **Cancel**: Sellers can cancel their active listings.
-  - **Security**: Implements `ReentrancyGuard` for secure transactions.
+1. **NFTMarket.sol** - Main marketplace contract
+   - Handles NFT listing, purchasing, and cancellation
+   - Uses ERC20 tokens (RCH) for payments
+   - Implements ReentrancyGuard for security
 
-- **ERC20 Token (`RCH.sol`)**
-  - Standard ERC20 token implementation.
-  - **Name**: Ruochen (RCH).
-  - **Extended Functionality**: Implements `transferWithCallback` for seamless integration allowing token transfers to trigger actions in receiving contracts.
+2. **RCH.sol** - ERC20 Token Contract
+   - Custom ERC20 token used for marketplace transactions
+   - Standard OpenZeppelin ERC20 implementation
 
-- **ERC721 NFT (`Ruochen.sol`)**
-  - Standard ERC721 NFT implementation.
-  - **Name**: Ruochen (RC).
-  - **Metadata**: Supports per-token URI storage for metadata.
-  - **Minting**: Owner-only minting capability.
+3. **Ruochen.sol** - NFT Contract
+   - ERC721 NFT contract for minting unique tokens
+   - Includes minting functionality
 
-### Project Structure
-
-```
-contracts/
-├── src/
-│   ├── NFTMarket.sol   # Marketplace Contract
-│   ├── RCH.sol         # Payment Token Contract
-│   └── Ruochen.sol     # NFT Contract
-├── script/
-│   └── DeployAll.s.sol # Deployment Script
-└── test/               # Foundry Tests
-```
-
-### Getting Started
+### 🛠 Development Setup
 
 #### Prerequisites
 
-- **Foundry**: A blazing fast, portable and modular toolkit for Ethereum application development.
-- **Git**
+- [Foundry](https://getfoundry.sh/) installed
+- Node.js for additional tooling
 
 #### Installation
 
-1. Clone the repository:
+```bash
+# Install Foundry dependencies
+forge install
 
-   ```bash
-   git clone https://github.com/iruochen/NFTMarket
-   cd NFTMarket/contracts
-   ```
+# Install additional dependencies (if any)
+forge install OpenZeppelin/openzeppelin-contracts
+```
 
-2. Install dependencies:
-   ```bash
-   forge install
-   ```
-
-#### Usage
-
-**Build Contracts:**
+#### Environment Setup
 
 ```bash
+# Copy environment template
+cp .env.example .env
+
+# Configure your environment variables
+# SEPOLIA_RPC_URL=your_sepolia_rpc_url
+# ETHERSCAN_API_KEY=your_etherscan_api_key
+# PRIVATE_KEY=your_private_key
+```
+
+### 🔨 Building and Testing
+
+```bash
+# Compile contracts
 forge build
-```
 
-**Run Tests:**
-
-```bash
+# Run tests
 forge test
+
+# Run tests with gas reporting
+forge test --gas-report
+
+# Run specific test
+forge test --match-test testFunctionName
 ```
 
-**Deploy:**
-To deploy to a network (e.g., Sepolia), set up your environment variables or pass them directly (not recommended for production keys).
+### 🚀 Deployment
+
+#### Local Deployment (Anvil)
 
 ```bash
-forge script script/DeployAll.s.sol:DeployAll --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+# Start local blockchain
+anvil
+
+# Deploy to local network
+forge script script/DeployAll.s.sol --rpc-url http://localhost:8545 --broadcast
+```
+
+#### Testnet Deployment (Sepolia)
+
+```bash
+# Deploy to Sepolia
+forge script script/DeployAll.s.sol --rpc-url sepolia --broadcast --verify
+
+# Or using environment variable
+forge script script/DeployAll.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast --verify
+```
+
+### 📊 Contract Addresses
+
+Deployed contract addresses are automatically saved to the `deployments/` directory after deployment.
+
+Example structure:
+
+```
+deployments/
+├── NFTMarket_11155111.json    # Sepolia deployment
+├── RCH_11155111.json          # RCH Token on Sepolia
+└── RuochenNFT_11155111.json   # NFT Contract on Sepolia
+```
+
+### 🔍 Verification
+
+Contracts are automatically verified during deployment when using the `--verify` flag. You can also verify manually:
+
+```bash
+forge verify-contract <contract-address> <contract-name> --chain-id <chain-id>
+```
+
+### 📖 Contract Documentation
+
+#### NFTMarket
+
+```solidity
+struct Listing {
+    address seller;
+    address ntfContract;  // Note: typo in original contract
+    uint256 tokenId;
+    uint256 price;
+    bool active;
+}
+```
+
+**Key Functions:**
+
+- `listNFT(address nftContract, uint256 tokenId, uint256 price)` - List an NFT for sale
+- `purchaseNFT(uint256 listingId)` - Purchase a listed NFT
+- `cancelListing(uint256 listingId)` - Cancel an active listing
+
+#### Security Features
+
+- ReentrancyGuard protection
+- Access control for listing management
+- Safe ERC20/ERC721 token transfers
+
+### 🧪 Testing Strategy
+
+Tests are organized in the `test/` directory:
+
+```bash
+test/
+└── NFTMarket.t.sol    # Comprehensive marketplace tests
+```
+
+Run comprehensive tests:
+
+```bash
+forge test -vvv  # Verbose output for debugging
 ```
 
 ---
 
-<a name="chinese"></a>
-
 ## 中文
 
-### 概览
+此目录包含 NFT 市场的 Solidity 智能合约，使用 Foundry 框架构建。
 
-一个基于以太坊构建的去中心化 NFT 交易市场项目。该项目包含了一个完整的生态系统，包括自定义的 ERC20 支付代币、ERC721 NFT 系列以及核心的市场交易合约。用户可以铸造 NFT，将其上架出售，并使用 RCH 代币进行购买。
+### 📋 合约概览
 
-### 功能特性
+#### 核心合约
 
-- **NFT 交易市场 (`NFTMarket.sol`)**
-  - **上架 (List)**: 卖家可以设定价格上架 NFT。
-  - **购买 (Buy)**: 买家可以使用 RCH 代币购买已上架的 NFT。
-  - **取消 (Cancel)**: 卖家可以随时取消当前的上架订单。
-  - **安全性**: 实现了 `ReentrancyGuard` 防重入攻击保护。
+1. **NFTMarket.sol** - 主要市场合约
+   - 处理 NFT 上架、购买和取消
+   - 使用 ERC20 代币 (RCH) 进行支付
+   - 实现 ReentrancyGuard 安全保护
 
-- **ERC20 代币 (`RCH.sol`)**
-  - 标准 ERC20 代币实现。
-  - **名称**: Ruochen (RCH)。
-  - **扩展功能**: 实现了 `transferWithCallback`，允许转账时触发接收合约的回调函数，提升交互体验。
+2. **RCH.sol** - ERC20 代币合约
+   - 用于市场交易的自定义 ERC20 代币
+   - 标准 OpenZeppelin ERC20 实现
 
-- **ERC721 NFT (`Ruochen.sol`)**
-  - 标准 ERC721 NFT 实现。
-  - **名称**: Ruochen (RC)。
-  - **元数据**: 支持为每个 Token 单独设置 URI 存储元数据。
-  - **铸造**: 仅合约拥有者可进行铸造。
+3. **Ruochen.sol** - NFT 合约
+   - 用于铸造独特代币的 ERC721 NFT 合约
+   - 包含铸造功能
 
-### 项目结构
-
-```
-contracts/
-├── src/
-│   ├── NFTMarket.sol   # 市场核心合约
-│   ├── RCH.sol         # 支付代币合约
-│   └── Ruochen.sol     # NFT 合约
-├── script/
-│   └── DeployAll.s.sol # 部署脚本
-└── test/               # Foundry 测试文件
-```
-
-### 快速开始
+### 🛠 开发环境设置
 
 #### 前置要求
 
-- **Foundry**: 一个用 Rust 编写的极速、便携且模块化的以太坊开发工具包。
-- **Git**
+- 安装 [Foundry](https://getfoundry.sh/)
+- Node.js（用于附加工具）
 
 #### 安装
 
-1. 克隆仓库：
+```bash
+# 安装 Foundry 依赖
+forge install
 
-   ```bash
-   git clone https://github.com/iruochen/NFTMarket
-   cd NFTMarket/contracts
-   ```
+# 安装额外依赖（如果有）
+forge install OpenZeppelin/openzeppelin-contracts
+```
 
-2. 安装依赖：
-   ```bash
-   forge install
-   ```
-
-#### 使用说明
-
-**编译合约:**
+#### 环境配置
 
 ```bash
+# 复制环境模板
+cp .env.example .env
+
+# 配置您的环境变量
+# SEPOLIA_RPC_URL=你的_sepolia_rpc_url
+# ETHERSCAN_API_KEY=你的_etherscan_api_key
+# PRIVATE_KEY=你的_私钥
+```
+
+### 🔨 构建和测试
+
+```bash
+# 编译合约
 forge build
-```
 
-**运行测试:**
-
-```bash
+# 运行测试
 forge test
+
+# 运行测试并生成 gas 报告
+forge test --gas-report
+
+# 运行特定测试
+forge test --match-test testFunctionName
 ```
 
-**部署合约:**
-要部署到网络（例如 Sepolia），请配置环境变量或直接传入参数（注意保护私钥安全）。
+### 🚀 部署
+
+#### 本地部署 (Anvil)
 
 ```bash
-forge script script/DeployAll.s.sol:DeployAll --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+# 启动本地区块链
+anvil
+
+# 部署到本地网络
+forge script script/DeployAll.s.sol --rpc-url http://localhost:8545 --broadcast
 ```
 
-### 许可证 / License
+#### 测试网部署 (Sepolia)
 
-MIT
+```bash
+# 部署到 Sepolia
+forge script script/DeployAll.s.sol --rpc-url sepolia --broadcast --verify
+
+# 或使用环境变量
+forge script script/DeployAll.s.sol --rpc-url $SEPOLIA_RPC_URL --broadcast --verify
+```
+
+### 📊 合约地址
+
+部署后的合约地址会自动保存到 `deployments/` 目录。
+
+示例结构:
+
+```
+deployments/
+├── NFTMarket_11155111.json    # Sepolia 部署
+├── RCH_11155111.json          # Sepolia 上的 RCH Token
+└── RuochenNFT_11155111.json   # Sepolia 上的 NFT 合约
+```
+
+### 🔍 验证
+
+使用 `--verify` 标志时，合约会在部署过程中自动验证。您也可以手动验证：
+
+```bash
+forge verify-contract <合约地址> <合约名称> --chain-id <链ID>
+```
+
+### 📖 合约文档
+
+#### NFTMarket
+
+```solidity
+struct Listing {
+    address seller;
+    address ntfContract;  // 注意：原合约中的拼写错误
+    uint256 tokenId;
+    uint256 price;
+    bool active;
+}
+```
+
+**主要函数:**
+
+- `listNFT(address nftContract, uint256 tokenId, uint256 price)` - 上架 NFT 出售
+- `purchaseNFT(uint256 listingId)` - 购买已上架的 NFT
+- `cancelListing(uint256 listingId)` - 取消活跃的上架
+
+#### 安全特性
+
+- ReentrancyGuard 重入保护
+- 上架管理的访问控制
+- 安全的 ERC20/ERC721 代币转移
+
+### 🧪 测试策略
+
+测试文件位于 `test/` 目录：
+
+```bash
+test/
+└── NFTMarket.t.sol    # 综合市场测试
+```
+
+运行完整测试：
+
+```bash
+forge test -vvv  # 详细输出以便调试
+```
+
+### 📄 许可证
+
+MIT License
