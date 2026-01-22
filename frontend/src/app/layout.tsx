@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: "Ruochen NFT Market",
 	description: "A decentralized marketplace for Ruochen NFTs",
+	icons: {
+		icon: "/logo.svg",
+	},
 }
 
 export default async function RootLayout({

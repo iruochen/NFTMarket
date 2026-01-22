@@ -5,10 +5,14 @@ import { useBalance, useConnection } from "wagmi"
 import { useEffect, useState, useCallback } from "react"
 import { useRCHToken } from "@/hooks/useMarketplace"
 import { formatEther } from "viem"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Sparkles } from "lucide-react"
 
 export default function Navbar() {
 	const { open } = useAppKit()
 	const { address, isConnected, chainId } = useConnection()
+	const pathname = usePathname()
 	const { balance: rchBalance, refetchBalance: refetchRCHBalance } =
 		useRCHToken()
 	const { data: ethBalance, refetch: refetchETHBalance } = useBalance({
@@ -40,8 +44,13 @@ export default function Navbar() {
 	if (!mounted) {
 		return (
 			<nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b border-gray-100 z-50 relative">
-				<div className="bg-linear-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent text-xl font-bold">
-					NFT Market
+				<div className="flex items-center gap-2">
+					<div className="w-8 h-8 bg-linear-to-br from-purple-600 to-blue-500 rounded-lg flex items-center justify-center">
+						<Sparkles className="w-5 h-5 text-white" />
+					</div>
+					<div className="bg-linear-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent text-xl font-bold">
+						NFT Market
+					</div>
 				</div>
 			</nav>
 		)
@@ -51,12 +60,37 @@ export default function Navbar() {
 
 	return (
 		<nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b border-gray-100 z-50 sticky top-0 backdrop-blur-md bg-opacity-90">
-			<div className="flex items-center gap-4">
-				<div
-					className="text-2xl font-bold bg-linear-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent cursor-pointer"
-					onClick={() => window.location.reload()}
-				>
-					NFT Market
+			<div className="flex items-center gap-8">
+				<Link href="/" className="flex items-center gap-2 group">
+					<div className="w-10 h-10 bg-linear-to-br from-purple-600 to-blue-500 rounded-xl flex items-center justify-center shadow-indigo-200 shadow-lg group-hover:scale-110 transition-transform">
+						<Sparkles className="w-6 h-6 text-white" />
+					</div>
+					<div className="text-2xl font-bold bg-linear-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">
+						NFT Market
+					</div>
+				</Link>
+
+				<div className="hidden md:flex items-center gap-6">
+					<Link
+						href="/"
+						className={`text-sm font-medium transition-colors ${
+							pathname === "/"
+								? "text-blue-600"
+								: "text-gray-500 hover:text-gray-900"
+						}`}
+					>
+						Marketplace
+					</Link>
+					<Link
+						href="/transactions"
+						className={`text-sm font-medium transition-colors ${
+							pathname === "/transactions"
+								? "text-blue-600"
+								: "text-gray-500 hover:text-gray-900"
+						}`}
+					>
+						Transactions
+					</Link>
 				</div>
 
 				{isWrongNetwork && (
